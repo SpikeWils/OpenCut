@@ -35,6 +35,9 @@ Distance to steps factor
 #define FM_ENA_PIN 8                                  //Define pin number for motor controller enable pin
 #define FM_DIR_PIN 5                                  //Define pin number for motor controller direction pin
 #define FM_PUL_PIN 2                                  //Define pin number for motor controller pulse/step pin
+#define HOME_SWITCH_PIN 10                            //Define pin number for homing switch (N.O)
+#define LIMIT_SWITCH_MAX_PIN 11                       //Define pin number for maximum R.O.M limit switch
+#define LIMIT_SWITCH_MIN_PIN 12                       //Define pin number for minimum R.O.M limit switch
 
 /*****************************************************
    DEFINE PARAMETERS
@@ -81,6 +84,8 @@ void setup()                                          //Setup function
   
   delay(500);                                         //Wait 500ms
   Serial.println("Serial comm init");                 //Print to serial monitor
+
+  pinMode(HOME_SWITCH_PIN, uint8_t INPUT_PULLUP);     //Set home switch pin as input (active low)
 
   FeedMotor.setEnablePin(FM_ENA_PIN);                 //Declare feed motor enable pin [Must be manually declared when using driver type in class]
   FeedMotor.setPinsInverted(false, false, true);      //Invert the logic of the enable pin (step, direction, enable)
