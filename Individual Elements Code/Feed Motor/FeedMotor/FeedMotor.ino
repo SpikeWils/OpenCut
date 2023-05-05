@@ -2,11 +2,35 @@
 
 Abbreviations
 -------------------------
-FM = Feed Motor
-CM = Cut Motor
-ENA = Enable
-DIR = Direction
-PUL = Pulse (A.K.A Step)
+  FM = Feed Motor
+  CM = Cut Motor
+  ENA = Enable
+  DIR = Direction
+  PUL = Pulse (A.K.A Step)
+  CW = Clockwise
+  CCW = Counter Clockwise
+
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                          TB6600 STEPPER MOTOR DRIVER DIP SWITCH SETTINGS                          ║
+╠═════╦═════╦═════╦═══════════════╦═══════════╦══╦═════╦═════╦═════╦═════════════╦══════════════════╣
+║  S1 ║  S2 ║  S3 ║ µStep Setting ║ Pulse/Rev ║  ║  S4 ║  S5 ║  S6 ║ CURRENT (A) ║ PEAK CURRENT (A) ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║  ON ║  ON ║  ON ║       NC      ║     NC    ║  ║  ON ║  ON ║  ON ║     0.5     ║        0.7       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║  ON ║  ON ║ OFF ║   FULL STEP   ║    200    ║  ║  ON ║ OFF ║  ON ║     1.0     ║        1.2       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║  ON ║ OFF ║  ON ║    1/2 STEP   ║    400    ║  ║  ON ║  ON ║ OFF ║     1.5     ║        1.7       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║ OFF ║  ON ║  ON ║    1/2 STEP   ║    400    ║  ║  ON ║ OFF ║ OFF ║     2.0     ║        2.2       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║  ON ║ OFF ║ OFF ║    1/4 STEP   ║    800    ║  ║ OFF ║  ON ║  ON ║     2.5     ║        2.7       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║ OFF ║  ON ║ OFF ║    1/8 STEP   ║    1600   ║  ║ OFF ║ OFF ║  ON ║     2.8     ║        2.9       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║ OFF ║ OFF ║  ON ║   1/16 STEP   ║    3200   ║  ║ OFF ║  ON ║ OFF ║     3.0     ║        3.2       ║
+╠═════╬═════╬═════╬═══════════════╬═══════════╣  ╠═════╬═════╬═════╬═════════════╬══════════════════╣
+║ OFF ║ OFF ║ OFF ║   1/32 STEP   ║    6400   ║  ║ OFF ║ OFF ║ OFF ║     3.2     ║        4.0       ║
+╚═════╩═════╩═════╩═══════════════╩═══════════╩══╩═════╩═════╩═════╩═════════════╩══════════════════╝
 
 
 Distance to steps factor
@@ -24,7 +48,9 @@ Distance to steps factor
 
 */
 
-
+/*****************************************************
+   LIBRARY INCLUDES
+*****************************************************/
 
 #include <AccelStepper.h>
 
@@ -43,9 +69,9 @@ Distance to steps factor
 #define FM_MAX_SPEED 1000                             //Define maximum motor speed value
 #define FM_MAX_ACCEL 1000                             //Define maximum motor acceleration value
 
-#define CIRCUMFERENCE 182.2                           //Define circumference of feed roller
-#define STEP_ANGLE 1.8                                //Define step angle of motor
-#define MICROSTEP_SETTING 8                           //Define the microstep setting of the motor controller
+#define FM_CIRCUMFERENCE 182.2                           //Define circumference of feed roller
+#define FM_STEP_ANGLE 1.8                                //Define step angle of motor
+#define FM_MICROSTEP_SETTING 8                           //Define the microstep setting of the motor controller
 
 /*------------------------------------------------
 | NOTE:                                           |
