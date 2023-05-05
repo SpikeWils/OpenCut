@@ -40,11 +40,11 @@ Distance to steps factor
   1mm Linear travel     = 0.506°  = 0.281 steps
   1m Linear travel      = 506°    = 281 steps 
 
-  (πd / 360) / step angle * microstep = steps per 1mm of linear travel
+  (πd / 360) / step angle * µstep = steps per 1mm of linear travel
 
   d = roller diameter
   step angle = full step angle of motor
-  microstep = divisor (e.g full step = 1, half step = 1/2, etc.)
+  µstep = divisor
 
 */
 
@@ -69,21 +69,28 @@ Distance to steps factor
 #define FM_MAX_SPEED 1000                             //Define maximum motor speed value
 #define FM_MAX_ACCEL 1000                             //Define maximum motor acceleration value
 
-#define FM_CIRCUMFERENCE 182.2                           //Define circumference of feed roller
-#define FM_STEP_ANGLE 1.8                                //Define step angle of motor
-#define FM_MICROSTEP_SETTING 8                           //Define the microstep setting of the motor controller
+#define FM_CIRCUMFERENCE 182.2                        //Define circumference of feed roller
+#define FM_STEP_ANGLE 1.8                             //Define step angle of motor
+#define FM_MICROSTEP_SETTING 8                        //Define the microstep setting of the motor controller
 
-/*------------------------------------------------
-| NOTE:                                           |
-|                                                 |
-| Micro step setting value determined as follows  |
-| Full step = 1                                   |
-| 1/2 step  = 2                                   |
-| 1/4 step  = 4                                   |
-| 1/8 step  = 8                                   |
-| 1/16 step = 16                                  |
-| 1/32 step = 32                                  |
--------------------------------------------------*/
+/*
+╔═══════════════════════════════════════════════╗
+║                      NOTE                     ║
+║ Microstep setting value determined as follows ║
+╠═══════════════════════════╦═══════════════════╣
+║         Full step         ║         1         ║
+╠═══════════════════════════╬═══════════════════╣
+║          1/2 step         ║         2         ║
+╠═══════════════════════════╬═══════════════════╣
+║          1/4 step         ║         4         ║
+╠═══════════════════════════╬═══════════════════╣
+║          1/8 step         ║         8         ║
+╠═══════════════════════════╬═══════════════════╣
+║         1/16 step         ║         16        ║
+╠═══════════════════════════╬═══════════════════╣
+║         1/32 step         ║         32        ║
+╚═══════════════════════════╩═══════════════════╝
+*/
 
 #define FM_D2S_FACTOR CIRCUMFERENCE / STEP_ANGLE * MICROSTEP_SETTING      //Defines the distance to steps factor
 
@@ -91,9 +98,12 @@ Distance to steps factor
    DECLARE VARIABLES & CONSTANTS
 *****************************************************/
 
-
-
 AccelStepper FeedMotor(AccelStepper::DRIVER, FM_PUL_PIN, FM_DIR_PIN);     //Create class for feed motor
+
+
+/*──────────────────────────────────────
+   SETUP
+──────────────────────────────────────*/
 
 
 void setup()                                          //Setup function
@@ -119,6 +129,9 @@ void setup()                                          //Setup function
 }
 
 
+/*──────────────────────────────────────
+   MAIN PROGRAM
+──────────────────────────────────────*/
 
 
 void loop()                                           //Main Program
@@ -138,7 +151,7 @@ void loop()                                           //Main Program
   Serial.print(distance);                              //Print linear distance to serial monitor
   Serial.print("mm, Steps: ");                         //Print to serial monitor
   Serial.println(steps);                               //Print number of steps to serial monitor
-  //Serial.println(FM_D2S_FACTOR);                       //Print Feed motor D2S factor to serial monitor 
+  
 
   FeedMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
   FeedMotor.setCurrentPosition(0);                     //Set current motor position as zero (this does not move the motor to position zero it sets the stored position to zero)

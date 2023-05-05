@@ -33,8 +33,8 @@ Abbreviations
 ╚═════╩═════╩═════╩═══════════════╩═══════════╩══╩═════╩═════╩═════╩═════════════╩══════════════════╝
 
 
-Cut Motor Driver Settings
--------------------------
+Cut Motor Driver Settings (Current)
+-----------------------------------
 S1 = ON       - FULL STEP
 S2 = ON
 S3 = OFF
@@ -44,11 +44,12 @@ S6 = OFF
 
 Cut Motor Linear Travel Calculation
 -----------------------------------
+
                 Steps per turn x microstep setting
 Steps per mm = ────────────────────────────────────── x gear ratio
                             Screw pitch
 
-*/
+
 /*****************************************************
    LIBRARY INCLUDES
 *****************************************************/
@@ -98,17 +99,63 @@ Steps per mm = ─────────────────────�
 ╚═══════════════════════════╩═══════════════════╝
 */
 
-#define CM_STEPS_PER_TURN CM_STEP_ANGLE*360
-#define CM_S2L_FACTOR ((CM_STEPS_PER_TURN * CM_MICROSTEP_SETTING) / CM_SCREW_PITCH) * CM_GEAR_RATIO
+#define CM_STEPS_PER_TURN CM_STEP_ANGLE*360                                                               //Calculate number of steps per full turn of motor
+#define CM_S2L_FACTOR ((CM_STEPS_PER_TURN * CM_MICROSTEP_SETTING) / CM_SCREW_PITCH) * CM_GEAR_RATIO       //Calculate number of steps per 1mm linear travel of carriage
 
 /*****************************************************
    DECLARE VARIABLES & CONSTANTS
 *****************************************************/
 
-int CM_homing_pos = 0;
+int CM_homing_pos = 0;                                //Declare global variable for homing position
 
 
-AccelStepper CutMotor(AccelStepper::DRIVER, CM_PUL_PIN, CM_DIR_PIN);     //Create class for feed motor
+AccelStepper CutMotor(AccelStepper::DRIVER, CM_PUL_PIN, CM_DIR_PIN);     //Create class for cut motor
+
+/*──────────────────────────────────────
+   STARTUP HOMING POSITION
+──────────────────────────────────────*/
+
+void CM_startup_homing_sequence()                     //Declare function for homing cut motor at startup
+{
+  CutMotor.setEnablePin(CM_ENA_PIN);                  //Declare feed motor enable pin [Must be manually declared when using driver type in class]
+  CutMotor.setPinsInverted(false, false, true);       //Invert the logic of the enable pin (step, direction, enable)
+  CutMotor.setMaxSpeed(CM_MAX_SPEED);                 //Set speed = steps/second
+  CutMotor.setAcceleration(CM_MAX_ACCEL);             //Set acceleration = steps/(second)^2
+  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
+
+  Serial.println("Cut motor homing...");              //Print to serial monitor
+
+  while(digitalRead(CM_HOME_SWITCH_PIN))              //Rotate CCW until homing switch is pressed
+  {
+    CutMotor.moveTo(CM_homing_pos);                   //Move cut motor to homing position
+    CM_homing_pos--;                                  //Decrement homing position
+    CutMotor.run();                                   //Run cut motor
+    delay(50);                                        //Delay 50ms to prevent motor stepping too fast and causing damage
+  }
+
+  CM_homing_pos = 1;
+  CutMotor.setCurrentPosition(0);                     //Set home position to zero
+  
+
+  while(!digitalRead(CM_HOME_SWITCH_PIN))             //Rotate CW until homing switch is not pressed
+  {
+    CutMotor.moveTo(CM_homing_pos);                   //Move cut motor to homing position
+    CM_homing_pos++;                                  //Increment homing position
+    CutMotor.run();                                   //Run cut motor
+    delay(50);                                        //Delay 50ms to prevent motor stepping too fast and causing damage
+  }  
+
+  CutMotor.setCurrentPosition(0);                     //Set home position to zero
+  CutMotor.disableOutputs();                          //Prevent current flow to motor (prevents overheating)
+
+  Serial.print("Cut Motor Position: ");               //Print to serial monitor
+  Serial.print(CM_homing_pos);                        //Print value of homing position to serial monitor (must always be zero)
+}
+
+
+/*──────────────────────────────────────
+   SETUP
+──────────────────────────────────────*/
 
 
 void setup()                                          //Setup function
@@ -121,50 +168,21 @@ void setup()                                          //Setup function
   }
   
   delay(500);                                         //Wait 500ms
-  Serial.println("Serial communication initialised");                 //Print to serial monitor
+  Serial.println("Serial communication initialised");             //Print to serial monitor
 
-  pinMode(CM_HOME_SWITCH_PIN, INPUT_PULLUP);             //Set home switch pin as input (active low)
+  pinMode(CM_HOME_SWITCH_PIN, INPUT_PULLUP);          //Set home switch pin as input (active low)
   pinMode(CM_LIMIT_SWITCH_MAX_PIN, INPUT_PULLUP);     //Set maximum limit switch pin as input (active low)
   pinMode(CM_LIMIT_SWITCH_MIN_PIN, INPUT_PULLUP);     //Set minimum limit switch pin as input (active low)
 
-  CutMotor.setEnablePin(CM_ENA_PIN);                  //Declare feed motor enable pin [Must be manually declared when using driver type in class]
-  CutMotor.setPinsInverted(false, false, true);       //Invert the logic of the enable pin (step, direction, enable)
-  CutMotor.setMaxSpeed(CM_MAX_SPEED);                 //Set speed = steps/second
-  CutMotor.setAcceleration(CM_MAX_ACCEL);             //Set acceleration = steps/(second)^2
-  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
-
-  Serial.println("Cut motor homing...");              //Print to serial monitor
-
-  while(digitalRead(CM_HOME_SWITCH_PIN))              //Rotate CCW until homing switch is pressed
-  {
-    CutMotor.moveTo(CM_homing_pos);                    //Move cut motor to homing position
-    CM_homing_pos--;                                   //Decrement homing position
-    CutMotor.run();                                    //Run cut motor
-    delay(50);                                         //Delay 50ms to prevent motor stepping too fast and causing damage
-  }
-
-  CM_homing_pos = 1;
-  CutMotor.setCurrentPosition(0);                      //Set home position to zero
+  CM_startup_homing_sequence();                      //Call function for homing cut motor at startup
   
-
-  while(!digitalRead(CM_HOME_SWITCH_PIN))              //Rotate CW until homing switch is not pressed
-  {
-    CutMotor.moveTo(CM_homing_pos);                    //Move cut motor to homing position
-    CM_homing_pos++;                                   //Increment homing position
-    CutMotor.run();                                    //Run cut motor
-    delay(50);                                         //Delay 50ms to prevent motor stepping too fast and causing damage
-  }  
-
-  CutMotor.setCurrentPosition(0);                      //Set home position to zero
-  CutMotor.disableOutputs();                           //Prevent current flow to motor (prevents overheating)
-
-  Serial.print("Cut Motor Position: ");                //Print to serial monitor
-  Serial.print(CM_homing_pos);                         //Print value of homing position to serial monitor (must always be zero)
-  Serial.println("\nSetup Complete");                  //Print to serial monitor
+  Serial.println("\nSetup Complete");                 //Print to serial monitor
 }
 
 
-
+/*──────────────────────────────────────
+   MAIN PROGRAM
+──────────────────────────────────────*/
 
 void loop()                                           //Main Program
 {
