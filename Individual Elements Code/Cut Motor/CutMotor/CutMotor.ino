@@ -7,6 +7,8 @@ CM = Cut Motor
 ENA = Enable
 DIR = Direction
 PUL = Pulse (A.K.A Step)
+CW = Clockwise
+CCW = Counter Clockwise
 
 
 Distance to steps factor
@@ -68,9 +70,10 @@ Distance to steps factor
    DECLARE VARIABLES & CONSTANTS
 *****************************************************/
 
+int homing_pos = 0;
 
 
-AccelStepper FeedMotor(AccelStepper::DRIVER, FM_PUL_PIN, FM_DIR_PIN);     //Create class for feed motor
+AccelStepper CutMotor(AccelStepper::DRIVER, FM_PUL_PIN, FM_DIR_PIN);     //Create class for feed motor
 
 
 void setup()                                          //Setup function
@@ -85,16 +88,30 @@ void setup()                                          //Setup function
   delay(500);                                         //Wait 500ms
   Serial.println("Serial comm init");                 //Print to serial monitor
 
-  pinMode(HOME_SWITCH_PIN, uint8_t INPUT_PULLUP);     //Set home switch pin as input (active low)
+  pinMode(HOME_SWITCH_PIN, INPUT_PULLUP);             //Set home switch pin as input (active low)
 
-  FeedMotor.setEnablePin(FM_ENA_PIN);                 //Declare feed motor enable pin [Must be manually declared when using driver type in class]
-  FeedMotor.setPinsInverted(false, false, true);      //Invert the logic of the enable pin (step, direction, enable)
-  FeedMotor.setMaxSpeed(FM_MAX_SPEED);                //Set speed = steps/second
-  FeedMotor.setAcceleration(FM_MAX_ACCEL);            //Set acceleration = steps/(second)^2
+  CutMotor.setEnablePin(FM_ENA_PIN);                  //Declare feed motor enable pin [Must be manually declared when using driver type in class]
+  CutMotor.setPinsInverted(false, false, true);       //Invert the logic of the enable pin (step, direction, enable)
+  CutMotor.setMaxSpeed(FM_MAX_SPEED);                 //Set speed = steps/second
+  CutMotor.setAcceleration(FM_MAX_ACCEL);             //Set acceleration = steps/(second)^2
+  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
 
-  FeedMotor.disableOutputs();                         //Prevent current flow to motor (prevents overheating)
+  Serial.println("Cut motor homing...");              //Print to serial monitor
 
-  Serial.println("Setup Complete");                   //Print to serial monitor
+  while(digitalRead(HOME_SWITCH_PIN))                 //Rotate CCW until homing switch is pressed
+  {
+    CutMotor.moveTo(homing_pos);                      //Move cut motor to homing position
+    homing_pos--;                                     //Decrement homin position
+    CutMotor.run();                                   //Run cut motor
+    delay(50);                                        //Delay 50ms to prevent motor stepping too fast and causing damage
+  }
+
+  CutMotor.setCurrentPosition(0);                     //Set home position to zero
+  CutMotor.disableOutputs();                          //Prevent current flow to motor (prevents overheating)
+
+  Serial.print("Cut Motor Position: ");               //Print to serial monitor
+  Serial.print(homing_pos);                           //Print value of homing position to serial monitor
+  Serial.println("/n Setup Complete");                //Print to serial monitor
 }
 
 
@@ -119,17 +136,17 @@ void loop()                                           //Main Program
   Serial.println(steps);                               //Print number of steps to serial monitor
   //Serial.println(FM_D2S_FACTOR);                       //Print Feed motor D2S factor to serial monitor 
 
-  FeedMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
-  FeedMotor.setCurrentPosition(0);                     //Set current motor position as zero (this does not move the motor to position zero it sets the stored position to zero)
-  FeedMotor.moveTo(steps);                             //Move the feed motor by the number of steps required
+  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
+  CutMotor.setCurrentPosition(0);                     //Set current motor position as zero (this does not move the motor to position zero it sets the stored position to zero)
+  CutMotor.moveTo(steps);                             //Move the feed motor by the number of steps required
 
-  while (FeedMotor.isRunning())                        //While the motor is in motion
+  while (CutMotor.isRunning())                        //While the motor is in motion
   {
-    FeedMotor.run();                                   //Advance motor to next step
+    CutMotor.run();                                   //Advance motor to next step
   }
 
-  FeedMotor.disableOutputs();                          //Disable the outputs on the motor controller (prevent current flowing to motor)
+  CutMotor.disableOutputs();                          //Disable the outputs on the motor controller (prevent current flowing to motor)
   delay(1000);                                         //Wait 1 sec
-  FeedMotor.setCurrentPosition(0);                     //Set motor position as zero
+  CutMotor.setCurrentPosition(0);                     //Set motor position as zero
 }
 
