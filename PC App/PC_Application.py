@@ -1,4 +1,5 @@
 import sys
+import serial
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import datetime
@@ -13,17 +14,20 @@ class ArduinoController(QWidget):
     def initUI(self):
         # Set up start, pause and menu buttons
         startButton = QPushButton('Start', self)
+        startButton.setStyleSheet("background-color: green")
         startButton.clicked.connect(self.startButtonClicked)
         pauseButton = QPushButton('Pause', self)
+        pauseButton.setStyleSheet("background-color: orange")
         pauseButton.clicked.connect(self.pauseButtonClicked)
         menuButton = QPushButton('Menu', self)
         menuButton.clicked.connect(self.menuButtonClicked)
 
         # Set up text input field
         self.textEdit = QTextEdit(self)
-        self.textEdit.setPlaceholderText('Type text to be sent to Arduino')
+        self.textEdit.setPlaceholderText('Enter cable I.D')
 
         # Set up text display window
+        self.messageLabel = QLabel('Messages', self)
         self.textDisplay = QTextEdit(self)
         self.textDisplay.setReadOnly(True)
 
@@ -37,13 +41,14 @@ class ArduinoController(QWidget):
         vbox.addWidget(startButton)
         vbox.addWidget(pauseButton)
         vbox.addWidget(menuButton)
-        vbox.addWidget(self.textEdit)
+        vbox.addWidget(self.messageLabel)
         vbox.addWidget(self.textDisplay)
+        vbox.addWidget(self.textEdit)
         vbox.addWidget(self.dateTimeLabel)
 
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
-        self.setWindowTitle('Arduino Controller')
+        self.setWindowTitle('Cable Cutter Interface')
         self.show()
 
     def startButtonClicked(self):
@@ -66,7 +71,7 @@ class ArduinoController(QWidget):
     def updateDateTime(self):
         # Update date and time label
         now = datetime.datetime.now()
-        self.dateTimeLabel.setText(now.strftime('%Y-%m-%d %H:%M:%S'))
+        self.dateTimeLabel.setText('Date: ' + now.strftime('%d/%m/%Y') + ' Time: ' + now.strftime('%H:%M:%S'))
 
     def readSerial(self):
         # Read text sent by Arduino and display it in the text display window
