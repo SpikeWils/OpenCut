@@ -3,6 +3,32 @@ import serial
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import datetime
+from serial.tools import list_ports
+
+def find_arduino_port():
+    ports = list_ports.comports()
+    for port in ports:
+        if "Arduino" in port.description or "USB Serial Device" in port.description:
+            return port.device
+    return None
+
+class SettingsWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        backButton = QPushButton('Back', self)
+        backButton.clicked.connect(self.backButtonClicked)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(backButton)
+        self.setLayout(vbox)
+        self.setWindowTitle('Settings')
+
+    def backButtonClicked(self):
+        self.close()
 
 class ArduinoController(QWidget):
     def __init__(self):
@@ -54,9 +80,13 @@ class ArduinoController(QWidget):
     def startButtonClicked(self):
         # Open serial communication with Arduino and send text in the text input field
         if not self.serial:
-            self.serial = serial.Serial('COM5', 9600) # Replace 'COM3' with your serial port name and 9600 with your baud rate
-        text = self.textEdit.toPlainText()
-        self.serial.write(text.encode())
+            arduino_port = find_arduino_port()
+            if arduino_port:
+                self.serial = serial.Serial(arduino_port, 9600)
+                text = self.textEdit.toPlainText()
+                self.serial.write(text.encode())
+            else:
+                QMessageBox.warning(self, "Warning", "Could not find Arduino COM port.")
 
     def pauseButtonClicked(self):
         # Send 'pause' command to Arduino
@@ -64,9 +94,8 @@ class ArduinoController(QWidget):
             self.serial.write(b'pause')
 
     def menuButtonClicked(self):
-        # Send 'menu' command to Arduino
-        if self.serial:
-            self.serial.write(b'menu')
+        self.settings_window = SettingsWindow()
+        self.settings_window.show()
 
     def updateDateTime(self):
         # Update date and time label
@@ -82,6 +111,7 @@ class ArduinoController(QWidget):
     def closeEvent(self, event):
         # Close serial communication with Arduino when the GUI is closed
         if self.serial:
+
             self.serial.close()
         event.accept()
 
