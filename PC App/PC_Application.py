@@ -2,6 +2,7 @@ import sys
 import serial
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import datetime
 from serial.tools import list_ports
 
@@ -42,10 +43,10 @@ class ArduinoController(QWidget):
         connectButton.clicked.connect(self.connectButtonClicked)
 
         # Set up pause and resume buttons
-        pauseButton = QPushButton('Pause', self)
+        pauseButton = QPushButton('Pause Machine', self)
         pauseButton.setStyleSheet("background-color: orange")
         pauseButton.clicked.connect(self.pauseButtonClicked)
-        resumeButton = QPushButton('Resume', self)
+        resumeButton = QPushButton('Resume Machine', self)
         resumeButton.setStyleSheet("background-color: green")
         resumeButton.clicked.connect(self.resumeButtonClicked)
 
@@ -54,11 +55,18 @@ class ArduinoController(QWidget):
         menuButton.clicked.connect(self.menuButtonClicked)
 
         # Set up text input field
-        self.textEdit = QTextEdit(self)
-        self.textEdit.setPlaceholderText('Enter cable I.D')
+        self.textEdit = QLineEdit(self)
+        self.textEdit.setPlaceholderText('Commands')
+        regex = QRegExp("[A-Za-z0-9.,-]*")
+        validator = QRegExpValidator(regex)
+        self.textEdit.setValidator(validator)
+
+        # Set up execute button
+        executeButton = QPushButton('Execute', self)
+        executeButton.clicked.connect(self.executeButtonClicked)
 
         # Set up text display window
-        self.messageLabel = QLabel('Messages', self)
+        self.messageLabel = QLabel('Event Log', self)
         self.textDisplay = QTextEdit(self)
         self.textDisplay.setReadOnly(True)
 
@@ -79,6 +87,7 @@ class ArduinoController(QWidget):
         vbox.addWidget(self.messageLabel)
         vbox.addWidget(self.textDisplay)
         vbox.addWidget(self.textEdit)
+        vbox.addWidget(executeButton)
         vbox.addWidget(self.dateTimeLabel)
 
         self.setLayout(vbox)
@@ -109,14 +118,18 @@ class ArduinoController(QWidget):
         self.settings_window = SettingsWindow()
         self.settings_window.show()
 
+    def executeButtonClicked(self):
+        # Send text from the input field to the Arduino
+        if self.serial:
+            command = self.textEdit.text().encode()
+            self.serial.write(command)
+
     def updateDateTime(self):
         # Update date and time label
         now = datetime.datetime.now()
         self.dateTimeLabel.setText('Date: ' + now.strftime('%d/%m/%Y') + ' Time: ' + now.strftime('%H:%M:%S'))
 
     def readSerial(self):
-        # Read text sent
-
         # Read text sent by Arduino and display it in the text display window
         if self.serial and self.serial.in_waiting > 0:
             text = self.serial.readline().decode().strip()
@@ -125,7 +138,6 @@ class ArduinoController(QWidget):
     def closeEvent(self, event):
         # Close serial communication with Arduino when the GUI is closed
         if self.serial:
-
             self.serial.close()
         event.accept()
 

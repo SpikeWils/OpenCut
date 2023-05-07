@@ -1,0 +1,46 @@
+12:46:07 - InkShield serial console...
+12:46:07 - Send characters to print:
+12:46:16 - Printed ascii character: 84
+12:46:16 - Printed ascii character: 69
+12:46:16 - Printed ascii character: 83
+12:46:16 - Printed ascii character: 84
+12:46:19 - Printed ascii character: 80
+12:46:19 - Printed ascii character: 65
+12:46:19 - Printed ascii character: 85
+12:46:19 - Printed ascii character: 83
+12:46:20 - Printed ascii character: 69
+12:46:47 - InkShield serial console...
+12:46:47 - Send characters to print:
+12:46:54 - Printed ascii character: 65
+12:53:44 - InkShield serial console...
+12:53:44 - Send characters to print:
+12:53:50 - Printed ascii character: 50
+12:53:50 - Printed ascii character: 50
+12:53:50 - Printed ascii character: 50
+12:53:58 - InkShield serial console...
+12:53:58 - Send characters to print:
+12:54:02 - Printed ascii character: 51
+12:54:02 - Printed ascii character: 52
+12:54:03 - Printed ascii character: 53
+13:48:38 - InkShield serial console...
+13:48:39 - Send characters to print:
+14:04:33 - InkShield serial console...
+14:04:33 - Send characters to print:
+14:04:41 - Printed ascii character: 80
+14:04:41 - Printed ascii character: 65
+14:04:41 - Printed ascii character: 85
+14:04:41 - Printed ascii character: 83
+14:04:41 - Printed ascii character: 69
+14:04:47 - Printed ascii character: 82
+14:04:47 - Printed ascii character: 69
+14:04:47 - Printed ascii character: 83
+14:04:48 - Printed ascii character: 85
+14:04:48 - Printed ascii character: 77
+14:04:48 - Printed ascii character: 69
+14:04:57 - Printed ascii character: 49
+14:04:57 - Printed ascii character: 50
+14:04:57 - Printed ascii character: 48
+14:04:57 - Printed ascii character: 46
+14:04:57 - Printed ascii character: 50
+14:04:57 - Printed ascii character: 50
+14:04:58 - Printed ascii character: 50
