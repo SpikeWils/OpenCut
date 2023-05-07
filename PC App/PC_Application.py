@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import datetime
+import json
 from serial.tools import list_ports
 
 def get_available_ports():
@@ -54,6 +55,7 @@ class CableDataWidget(QWidget):
             data = CableData(cable_id, length, cable_gauge)
             self.parent.cable_data.append(data)
             self.parent.update_cable_data_list()
+            self.parent.save_cable_data()  # Save cable data to the JSON file when new data is added
             self.cable_id_edit.clear()
             self.length_edit.clear()
             self.cable_gauge_edit.clear()
@@ -103,6 +105,7 @@ class ArduinoController(QWidget):
         self.current_cable_data_index = -1
         self.initUI()
         self.initLogFile()
+        self.load_cable_data()  # Load cable data from the JSON file when the application is launched
 
     def initUI(self):
         # Set up port selection drop-down menu and connect button
@@ -260,6 +263,26 @@ class ArduinoController(QWidget):
         if self.current_cable_data_index < len(self.cable_data) - 1:
             self.current_cable_data_index += 1
             self.cableDataList.setCurrentRow(self.current_cable_data_index)
+
+    def save_cable_data(self):
+        try:
+            with open('cable_data.json', 'w') as f:
+                json_data = [data.__dict__ for data in self.cable_data]
+                json.dump(json_data, f)
+        except Exception as e:
+            QMessageBox.warning(self, "Warning", "Unable to save cable data to JSON file.")
+
+    def load_cable_data(self):
+        try:
+            with open('cable_data.json', 'r') as f:
+                json_data = json.load(f)
+                self.cable_data = [CableData(**data) for data in json_data]
+                self.update_cable_data_list()
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            QMessageBox.warning(self, "Warning", "Unable to load cable data from JSON file.")
+
 
     def closeEvent(self, event):
         # Close serial communication with Arduino when the GUI is closed
