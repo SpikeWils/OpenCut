@@ -76,3 +76,16 @@ InkShield serial console...
 Send characters to print:
 InkShield serial console...
 Send characters to print:
+InkShield serial console...
+Send characters to print:
+Printed ascii character: 82
+Printed ascii character: 69
+Printed ascii character: 83
+Printed ascii character: 85
+Printed ascii character: 77
+Printed ascii character: 69
+Printed ascii character: 80
+Printed ascii character: 65
+Printed ascii character: 85
+Printed ascii character: 83
+Printed ascii character: 69

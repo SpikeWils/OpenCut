@@ -118,6 +118,7 @@ class ArduinoController(QWidget):
         pauseButton = QPushButton('Pause Machine', self)
         pauseButton.setStyleSheet("background-color: orange")
         pauseButton.clicked.connect(self.pauseButtonClicked)
+
         resumeButton = QPushButton('Resume Machine', self)
         resumeButton.setStyleSheet("background-color: green")
         resumeButton.clicked.connect(self.resumeButtonClicked)
@@ -125,6 +126,10 @@ class ArduinoController(QWidget):
         # Set up menu button
         menuButton = QPushButton('Settings', self)
         menuButton.clicked.connect(self.menuButtonClicked)
+
+         # Set up delete button
+        deleteButton = QPushButton('Delete', self)
+        deleteButton.clicked.connect(self.delete_data)
 
         # Set up text input field
         self.textEdit = QLineEdit(self)
@@ -171,6 +176,7 @@ class ArduinoController(QWidget):
         vbox.addWidget(QLabel('Cable Data', self))
         vbox.addWidget(self.cableDataList)
         vbox.addWidget(self.cableDataInput)
+        vbox.addWidget(deleteButton)
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
         self.setWindowTitle('Cable Cutter Interface')
@@ -272,6 +278,20 @@ class ArduinoController(QWidget):
             pass
         except Exception as e:
             QMessageBox.warning(self, "Warning", "Unable to load cable data from JSON file.")
+
+    def delete_data(self):
+        if self.current_cable_data_index >= 0:
+            reply = QMessageBox.warning(self, "Warning", "Are you sure you want to delete this entry?",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                del self.cable_data[self.current_cable_data_index]
+                self.update_cable_data_list()
+                self.save_cable_data()
+                self.current_cable_data_index = -1
+        else:
+            QMessageBox.warning(self, "Warning", "Please select an entry to delete.")
+
 
 
     def closeEvent(self, event):
