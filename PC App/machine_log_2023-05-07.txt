@@ -46,3 +46,33 @@
 14:04:58 - Printed ascii character: 50
 InkShield serial console...
 Send characters to print:
+InkShield serial console...
+Send characters to print:
+Printed ascii character: 82
+Printed ascii character: 69
+Printed ascii character: 83
+Printed ascii character: 85
+Printed ascii character: 77
+Printed ascii character: 69
+Printed ascii character: 89
+Printed ascii character: 89
+Printed ascii character: 89
+InkShield serial console...
+Send characters to print:
+Printed ascii character: 49
+Printed ascii character: 49
+Printed ascii character: 49
+InkShield serial console...
+Send characters to print:
+Printed ascii character: 82
+Printed ascii character: 69
+Printed ascii character: 83
+Printed ascii character: 85
+Printed ascii character: 77
+Printed ascii character: 69
+InkShield serial console...
+Send characters to print:
+InkShield serial console...
+Send characters to print:
+InkShield serial console...
+Send characters to print:

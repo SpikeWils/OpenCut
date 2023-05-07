@@ -21,6 +21,7 @@ class SettingsWindow(QWidget):
 
     def initUI(self):
         # Set up file path input field
+        self.filePathLabel = QLabel("Enter filepath for machine log as follows: C:\\User\\Documents\\filename", self)
         self.filePathEdit = QLineEdit(self)
         self.filePathEdit.setText(self.parent.filePath)
         self.filePathEdit.setPlaceholderText('File Path')
@@ -31,6 +32,7 @@ class SettingsWindow(QWidget):
         backButton.clicked.connect(self.backButtonClicked)
 
         vbox = QVBoxLayout()
+        vbox.addWidget(self.filePathLabel)
         vbox.addWidget(self.filePathEdit)
         vbox.addWidget(backButton)
         self.setLayout(vbox)
@@ -107,7 +109,6 @@ class ArduinoController(QWidget):
         vbox.addWidget(self.textEdit)
         vbox.addWidget(executeButton)
         vbox.addWidget(self.dateTimeLabel)
-
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
         self.setWindowTitle('Cable Cutter Interface')
@@ -142,6 +143,7 @@ class ArduinoController(QWidget):
 
     def menuButtonClicked(self):
         self.settings_window = SettingsWindow(self)
+        self.settings_window.setGeometry(self.geometry())  # Set menu window width to the same as main window
         self.settings_window.show()
 
     def executeButtonClicked(self):
@@ -156,14 +158,21 @@ class ArduinoController(QWidget):
         self.dateTimeLabel.setText('Date: ' + now.strftime('%d/%m/%Y') + ' Time: ' + now.strftime('%H:%M:%S'))
 
     def readSerial(self):
-        # Read text sent by Arduino and display it in the text display window
-        if self.serial and self.serial.in_waiting > 0:
-            text = self.serial.readline().decode().strip()
-            self.textDisplay.append(text)
+    # Read text sent by Arduino and display it in the text display window
+        try:
+            if self.serial and self.serial.in_waiting > 0:
+                text = self.serial.readline().decode().strip()
+                self.textDisplay.append(text)
 
-            # Write log entry to file
-            with open(self.filePath, 'a') as f:
-                f.write(text + '\n')
+                # Write log entry to file
+                with open(self.filePath, 'a') as f:
+                    f.write(text + '\n')
+        except serial.serialutil.SerialException as e:
+            QMessageBox.warning(self, "Warning", "The serial connection has been lost. Please check the connection.")
+            if self.serial:
+                self.serial.close()
+            self.serial = None
+
 
     def closeEvent(self, event):
         # Close serial communication with Arduino when the GUI is closed
