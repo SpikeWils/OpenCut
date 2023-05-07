@@ -154,12 +154,6 @@ class ArduinoController(QWidget):
         # Set up cable data input widget
         self.cableDataInput = CableDataWidget(self)
 
-        # Set up next and previous buttons
-        prevButton = QPushButton('Previous', self)
-        prevButton.clicked.connect(self.prevButtonClicked)
-        nextButton = QPushButton('Next', self)
-        nextButton.clicked.connect(self.nextButtonClicked)
-
         # Set up layout
         vbox = QVBoxLayout()
         hbox = QHBoxLayout()
@@ -177,10 +171,6 @@ class ArduinoController(QWidget):
         vbox.addWidget(QLabel('Cable Data', self))
         vbox.addWidget(self.cableDataList)
         vbox.addWidget(self.cableDataInput)
-        hbox2 = QHBoxLayout()
-        hbox2.addWidget(prevButton)
-        hbox2.addWidget(nextButton)
-        vbox.addLayout(hbox2)
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
         self.setWindowTitle('Cable Cutter Interface')
