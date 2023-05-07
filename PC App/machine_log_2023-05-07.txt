@@ -107,3 +107,30 @@ Printed ascii character: 69
 20:37:13 - Printed ascii character: 49
 20:37:13 - Printed ascii character: 49
 20:37:13 - Printed ascii character: 49
+22:34:39 - InkShield serial console...
+22:34:39 - Send characters to print:
+22:34:41 - Printed ascii character: 84
+22:34:41 - Printed ascii character: 69
+22:34:41 - Printed ascii character: 83
+22:34:41 - Printed ascii character: 84
+22:36:12 - InkShield serial console...
+22:36:12 - Send characters to print:
+22:36:17 - Printed ascii character: 84
+22:36:17 - Printed ascii character: 69
+22:36:17 - Printed ascii character: 83
+22:36:17 - Printed ascii character: 84
+22:52:59 - InkShield serial console...
+22:52:59 - Send characters to print:
+22:53:03 - Printed ascii character: 75
+22:53:03 - Printed ascii character: 76
+22:53:03 - Printed ascii character: 78
+22:53:03 - Printed ascii character: 46
+22:53:03 - Printed ascii character: 48
+22:53:03 - Printed ascii character: 48
+22:53:03 - Printed ascii character: 44
+22:53:03 - Printed ascii character: 49
+22:53:03 - Printed ascii character: 48
+22:53:03 - Printed ascii character: 48
+22:53:04 - Printed ascii character: 48
+22:53:04 - Printed ascii character: 44
+22:53:04 - Printed ascii character: 51

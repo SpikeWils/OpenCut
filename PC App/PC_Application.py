@@ -32,7 +32,7 @@ class CableDataWidget(QWidget):
         self.cable_id_edit = QLineEdit(self)
         self.cable_id_edit.setPlaceholderText('Cable ID')
         self.length_edit = QLineEdit(self)
-        self.length_edit.setPlaceholderText('Length')
+        self.length_edit.setPlaceholderText('Length (mm)')
         self.cable_gauge_edit = QLineEdit(self)
         self.cable_gauge_edit.setPlaceholderText('Cable Gauge')
 
@@ -71,7 +71,7 @@ class SettingsWindow(QWidget):
 
     def initUI(self):
         # Set up file path input field
-        self.filePathLabel = QLabel("Enter filepath for machine log as follows: C:\\User\\Documents\\filename", self)
+        self.filePathTitle = QLabel("Data Log Filepath", self)  # Add this line
         self.filePathEdit = QLineEdit(self)
         self.filePathEdit.setText(self.parent.filePath)
         self.filePathEdit.setPlaceholderText('File Path')
@@ -82,11 +82,12 @@ class SettingsWindow(QWidget):
         backButton.clicked.connect(self.backButtonClicked)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(self.filePathLabel)
+        vbox.addStretch(1)
+        vbox.addWidget(self.filePathTitle)  # Add this line
         vbox.addWidget(self.filePathEdit)
         vbox.addWidget(backButton)
         self.setLayout(vbox)
-        self.setWindowTitle('Settings')
+        self.setWindowTitle('OpenCut Settings')
 
     def backButtonClicked(self):
         self.close()
@@ -124,6 +125,8 @@ class ArduinoController(QWidget):
         resumeButton.setStyleSheet("background-color: green")
         resumeButton.clicked.connect(self.resumeButtonClicked)
 
+
+
         # Set up menu button
         menuButton = QPushButton('Settings', self)
         menuButton.clicked.connect(self.menuButtonClicked)
@@ -134,14 +137,15 @@ class ArduinoController(QWidget):
 
         # Set up text input field
         self.textEdit = QLineEdit(self)
-        self.textEdit.setPlaceholderText('Commands')
+        self.textEdit.setPlaceholderText('Terminal')
         regex = QRegExp("[A-Za-z0-9.,-]*")
         validator = QRegExpValidator(regex)
         self.textEdit.setValidator(validator)
 
         # Set up execute button
-        executeButton = QPushButton('Execute', self)
-        executeButton.clicked.connect(self.executeButtonClicked)
+        sendButton = QPushButton('Send', self)
+        sendButton.clicked.connect(self.sendButtonClicked)
+
 
         # Set up text display window
         self.messageLabel = QLabel('Event Log', self)
@@ -151,7 +155,7 @@ class ArduinoController(QWidget):
         # Set up date and time label
         self.dateTimeLabel = QLabel('', self)
         self.updateDateTime()
-        self.dateTimeLabel.setAlignment(Qt.AlignRight)
+        self.dateTimeLabel.setAlignment(Qt.AlignLeft)
 
         # Set up cable data list display
         self.cableDataList = QListWidget(self)
@@ -168,16 +172,19 @@ class ArduinoController(QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(pauseButton)
         vbox.addWidget(resumeButton)
+        executeButton = QPushButton('Execute', self)
+        executeButton.clicked.connect(self.executeButtonClicked)
+        vbox.addWidget(executeButton)
         vbox.addWidget(menuButton)
         vbox.addWidget(self.messageLabel)
         vbox.addWidget(self.textDisplay)
         vbox.addWidget(self.textEdit)
-        vbox.addWidget(executeButton)
-        vbox.addWidget(self.dateTimeLabel)
+        vbox.addWidget(sendButton)
         vbox.addWidget(QLabel('Cable Data', self))
         vbox.addWidget(self.cableDataList)
         vbox.addWidget(self.cableDataInput)
         vbox.addWidget(deleteButton)
+        vbox.addWidget(self.dateTimeLabel)
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
         self.setWindowTitle('OpenCut Interface')
@@ -210,16 +217,26 @@ class ArduinoController(QWidget):
         if self.serial:
             self.serial.write(b'resume')
 
+    def executeButtonClicked(self):
+        if self.serial and self.current_cable_data_index >= 0:
+            cable_data = self.cable_data[self.current_cable_data_index]
+            data_string = "{},{},{}".format(cable_data.cable_id, cable_data.length, cable_data.cable_gauge)
+            self.serial.write(data_string.encode())
+        else:
+            QMessageBox.warning(self, "Warning", "Please select a valid cable entry and ensure the OpenCut is connected.")
+
     def menuButtonClicked(self):
         self.settings_window = SettingsWindow(self)
         self.settings_window.setGeometry(self.geometry())  # Set menu window width to the same as main window
         self.settings_window.show()
 
-    def executeButtonClicked(self):
+    def sendButtonClicked(self):
         # Send text from the input field to the Arduino
         if self.serial:
             command = self.textEdit.text().encode()
             self.serial.write(command)
+            self.textEdit.clear()
+
 
     def updateDateTime(self):
         # Update date and time label
@@ -254,16 +271,6 @@ class ArduinoController(QWidget):
     def cable_data_list_item_clicked(self, item):
         index = self.cableDataList.row(item)
         self.current_cable_data_index = index
-
-    def prevButtonClicked(self):
-        if self.current_cable_data_index > 0:
-            self.current_cable_data_index -= 1
-            self.cableDataList.setCurrentRow(self.current_cable_data_index)
-
-    def nextButtonClicked(self):
-        if self.current_cable_data_index < len(self.cable_data) - 1:
-            self.current_cable_data_index += 1
-            self.cableDataList.setCurrentRow(self.current_cable_data_index)
 
     def save_cable_data(self):
         try:
