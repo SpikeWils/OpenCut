@@ -5,12 +5,9 @@ from PyQt5.QtCore import *
 import datetime
 from serial.tools import list_ports
 
-def find_arduino_port():
+def get_available_ports():
     ports = list_ports.comports()
-    for port in ports:
-        if "Arduino" in port.description or "USB Serial Device" in port.description:
-            return port.device
-    return None
+    return [port.device for port in ports]
 
 class SettingsWindow(QWidget):
     def __init__(self):
@@ -38,13 +35,21 @@ class ArduinoController(QWidget):
         self.serial = None
 
     def initUI(self):
-        # Set up start, pause and menu buttons
-        startButton = QPushButton('Start', self)
-        startButton.setStyleSheet("background-color: green")
-        startButton.clicked.connect(self.startButtonClicked)
+        # Set up port selection drop-down menu and connect button
+        self.portSelector = QComboBox(self)
+        self.portSelector.addItems(get_available_ports())
+        connectButton = QPushButton('Connect', self)
+        connectButton.clicked.connect(self.connectButtonClicked)
+
+        # Set up pause and resume buttons
         pauseButton = QPushButton('Pause', self)
         pauseButton.setStyleSheet("background-color: orange")
         pauseButton.clicked.connect(self.pauseButtonClicked)
+        resumeButton = QPushButton('Resume', self)
+        resumeButton.setStyleSheet("background-color: green")
+        resumeButton.clicked.connect(self.resumeButtonClicked)
+
+        # Set up menu button
         menuButton = QPushButton('Menu', self)
         menuButton.clicked.connect(self.menuButtonClicked)
 
@@ -64,8 +69,12 @@ class ArduinoController(QWidget):
 
         # Set up layout
         vbox = QVBoxLayout()
-        vbox.addWidget(startButton)
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.portSelector)
+        hbox.addWidget(connectButton)
+        vbox.addLayout(hbox)
         vbox.addWidget(pauseButton)
+        vbox.addWidget(resumeButton)
         vbox.addWidget(menuButton)
         vbox.addWidget(self.messageLabel)
         vbox.addWidget(self.textDisplay)
@@ -77,21 +86,24 @@ class ArduinoController(QWidget):
         self.setWindowTitle('Cable Cutter Interface')
         self.show()
 
-    def startButtonClicked(self):
-        # Open serial communication with Arduino and send text in the text input field
+    def connectButtonClicked(self):
+        # Open serial communication with Arduino
         if not self.serial:
-            arduino_port = find_arduino_port()
+            arduino_port = self.portSelector.currentText()
             if arduino_port:
                 self.serial = serial.Serial(arduino_port, 9600)
-                text = self.textEdit.toPlainText()
-                self.serial.write(text.encode())
             else:
-                QMessageBox.warning(self, "Warning", "Could not find Arduino COM port.")
+                QMessageBox.warning(self, "Warning", "Please select a valid port.")
 
     def pauseButtonClicked(self):
         # Send 'pause' command to Arduino
         if self.serial:
             self.serial.write(b'pause')
+
+    def resumeButtonClicked(self):
+        # Send 'resume' command to Arduino
+        if self.serial:
+            self.serial.write(b'resume')
 
     def menuButtonClicked(self):
         self.settings_window = SettingsWindow()
@@ -103,6 +115,8 @@ class ArduinoController(QWidget):
         self.dateTimeLabel.setText('Date: ' + now.strftime('%d/%m/%Y') + ' Time: ' + now.strftime('%H:%M:%S'))
 
     def readSerial(self):
+        # Read text sent
+
         # Read text sent by Arduino and display it in the text display window
         if self.serial and self.serial.in_waiting > 0:
             text = self.serial.readline().decode().strip()
