@@ -89,3 +89,21 @@ Printed ascii character: 65
 Printed ascii character: 85
 Printed ascii character: 83
 Printed ascii character: 69
+20:36:56 - InkShield serial console...
+20:36:56 - Send characters to print:
+20:36:59 - Printed ascii character: 80
+20:36:59 - Printed ascii character: 65
+20:36:59 - Printed ascii character: 85
+20:36:59 - Printed ascii character: 83
+20:36:59 - Printed ascii character: 69
+20:37:04 - Printed ascii character: 84
+20:37:04 - Printed ascii character: 69
+20:37:05 - Printed ascii character: 83
+20:37:05 - Printed ascii character: 84
+20:37:09 - Printed ascii character: 84
+20:37:10 - Printed ascii character: 69
+20:37:10 - Printed ascii character: 83
+20:37:10 - Printed ascii character: 84
+20:37:13 - Printed ascii character: 49
+20:37:13 - Printed ascii character: 49
+20:37:13 - Printed ascii character: 49

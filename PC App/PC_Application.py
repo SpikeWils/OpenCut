@@ -94,12 +94,13 @@ class SettingsWindow(QWidget):
     def filePathEdited(self):
         self.parent.filePath = self.filePathEdit.text()
         self.parent.initLogFile()
+        QSettings('OpenCut', 'OpenCut Interface').setValue('filePath', self.parent.filePath)  # Save the edited filepath to QSettings
 
 class ArduinoController(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.filePath = 'machine_log_{}.txt'.format(datetime.datetime.now().strftime('%Y-%m-%d'))
+        self.filePath = QSettings('OpenCut', 'OpenCut Interface').value('filePath', 'machine_log_{}.txt'.format(datetime.datetime.now().strftime('%Y-%m-%d')))
         self.serial = None
         self.cable_data = []
         self.current_cable_data_index = -1
@@ -179,7 +180,7 @@ class ArduinoController(QWidget):
         vbox.addWidget(deleteButton)
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 250)
-        self.setWindowTitle('Cable Cutter Interface')
+        self.setWindowTitle('OpenCut Interface')
         self.show()
 
     def initLogFile(self):
@@ -232,9 +233,13 @@ class ArduinoController(QWidget):
                 text = self.serial.readline().decode().strip()
                 self.textDisplay.append(text)
 
+                # Add current time to the logged message in the .txt file
+                current_time = datetime.datetime.now().strftime('%H:%M:%S')
+                log_entry = "{} - {}".format(current_time, text)
+
                 # Write log entry to file
                 with open(self.filePath, 'a') as f:
-                    f.write(text + '\n')
+                    f.write(log_entry + '\n')
         except serial.serialutil.SerialException as e:
             QMessageBox.warning(self, "Warning", "The serial connection has been lost. Please check the connection.")
             if self.serial:
@@ -303,11 +308,6 @@ class ArduinoController(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    # Load file path from settings
-    filePath = os.path.abspath('machine_log_{}.txt'.format(datetime.datetime.now().strftime('%Y-%m-%d')))
-    settingsFilePath = QSettings('MyCompany', 'MyApp').value('filePath')
-    if settingsFilePath:
-        filePath = settingsFilePath
 
     ex = ArduinoController()
     timer = QTimer()
@@ -318,6 +318,6 @@ if __name__ == '__main__':
     serialTimer.start(100)  # Read serial input every 100ms
 
     # Save file path to settings
-    QSettings('MyCompany', 'MyApp').setValue('filePath', filePath)
+
 
     sys.exit(app.exec_())
