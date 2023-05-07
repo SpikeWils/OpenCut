@@ -44,3 +44,5 @@
 14:04:57 - Printed ascii character: 50
 14:04:57 - Printed ascii character: 50
 14:04:58 - Printed ascii character: 50
+InkShield serial console...
+Send characters to print:

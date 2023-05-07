@@ -1,3 +1,4 @@
+import os
 import sys
 import serial
 from PyQt5.QtWidgets import *
@@ -10,17 +11,27 @@ def get_available_ports():
     ports = list_ports.comports()
     return [port.device for port in ports]
 
+
 class SettingsWindow(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
+        self.parent = parent
         self.initUI()
 
     def initUI(self):
+        # Set up file path input field
+        self.filePathEdit = QLineEdit(self)
+        self.filePathEdit.setText(self.parent.filePath)
+        self.filePathEdit.setPlaceholderText('File Path')
+        self.filePathEdit.editingFinished.connect(self.filePathEdited)
+
+        # Set up back button
         backButton = QPushButton('Back', self)
         backButton.clicked.connect(self.backButtonClicked)
 
         vbox = QVBoxLayout()
+        vbox.addWidget(self.filePathEdit)
         vbox.addWidget(backButton)
         self.setLayout(vbox)
         self.setWindowTitle('Settings')
@@ -28,12 +39,19 @@ class SettingsWindow(QWidget):
     def backButtonClicked(self):
         self.close()
 
+    def filePathEdited(self):
+        self.parent.filePath = self.filePathEdit.text()
+        self.parent.initLogFile()
+
 class ArduinoController(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.initUI()
+        self.filePath = 'machine_log_{}.txt'.format(datetime.datetime.now().strftime('%Y-%m-%d'))
         self.serial = None
+
+        self.initUI()
+        self.initLogFile()
 
     def initUI(self):
         # Set up port selection drop-down menu and connect button
@@ -95,6 +113,14 @@ class ArduinoController(QWidget):
         self.setWindowTitle('Cable Cutter Interface')
         self.show()
 
+    def initLogFile(self):
+        # Create log file and write header
+        try:
+            with open(self.filePath, 'x') as f:
+                f.write('Event Log\n\n')
+        except FileExistsError:
+            pass
+
     def connectButtonClicked(self):
         # Open serial communication with Arduino
         if not self.serial:
@@ -115,7 +141,7 @@ class ArduinoController(QWidget):
             self.serial.write(b'resume')
 
     def menuButtonClicked(self):
-        self.settings_window = SettingsWindow()
+        self.settings_window = SettingsWindow(self)
         self.settings_window.show()
 
     def executeButtonClicked(self):
@@ -135,6 +161,10 @@ class ArduinoController(QWidget):
             text = self.serial.readline().decode().strip()
             self.textDisplay.append(text)
 
+            # Write log entry to file
+            with open(self.filePath, 'a') as f:
+                f.write(text + '\n')
+
     def closeEvent(self, event):
         # Close serial communication with Arduino when the GUI is closed
         if self.serial:
@@ -143,6 +173,13 @@ class ArduinoController(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+
+    # Load file path from settings
+    filePath = os.path.abspath('machine_log_{}.txt'.format(datetime.datetime.now().strftime('%Y-%m-%d')))
+    settingsFilePath = QSettings('MyCompany', 'MyApp').value('filePath')
+    if settingsFilePath:
+        filePath = settingsFilePath
+
     ex = ArduinoController()
     timer = QTimer()
     timer.timeout.connect(ex.updateDateTime)
@@ -150,4 +187,8 @@ if __name__ == '__main__':
     serialTimer = QTimer()
     serialTimer.timeout.connect(ex.readSerial)
     serialTimer.start(100) # Read serial input every 100ms
+
+    # Save file path to settings
+    QSettings('MyCompany', 'MyApp').setValue('filePath', filePath)
+
     sys.exit(app.exec_())
