@@ -220,10 +220,12 @@ class ArduinoController(QWidget):
     def executeButtonClicked(self):
         if self.serial and self.current_cable_data_index >= 0:
             cable_data = self.cable_data[self.current_cable_data_index]
-            data_string = "{},{},{}".format(cable_data.cable_id, cable_data.length, cable_data.cable_gauge)
+            data_string = "<{},{},{}>".format(cable_data.cable_id, cable_data.length, cable_data.cable_gauge)
             self.serial.write(data_string.encode())
         else:
             QMessageBox.warning(self, "Warning", "Please select a valid cable entry and ensure the OpenCut is connected.")
+
+
 
     def menuButtonClicked(self):
         self.settings_window = SettingsWindow(self)

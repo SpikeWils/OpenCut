@@ -134,3 +134,131 @@ Printed ascii character: 69
 22:53:04 - Printed ascii character: 48
 22:53:04 - Printed ascii character: 44
 22:53:04 - Printed ascii character: 51
+23:19:53 - Arduino is ready for instructions.
+23:19:59 - Arduino is paused.
+23:20:03 - Arduino is resumed.
+23:20:10 - Invalid input. Please enter either 'pause', 'resume', or a string in the format 'Cable ID: {}, Length: {}, Cable Gauge: {}'.
+23:25:15 - Arduino is ready for instructions.
+23:25:24 - Cable ID: KLN.00, Length: 1000, Cable Gauge: 3
+23:28:12 - Pausing execution...
+23:29:12 - Instruction received:
+23:29:12 - Cable ID: KLN.00
+23:29:12 - Length: 1000
+23:29:12 - Cable Gauge: 3
+23:29:41 - Resuming execution...
+23:29:45 - Pausing execution...
+23:36:05 - Arduino connected
+23:36:38 - Arduino connected
+23:37:21 - Arduino connected
+23:40:51 - Arduino connected
+23:41:08 - Arduino connected
+23:43:58 - Arduino connected
+23:44:03 - Cable ID: 000
+23:44:03 - Cable Length: 0
+23:44:03 - Cable Gauge: 0
+23:44:03 - Executing instruction
+23:44:27 - System paused
+23:44:32 - System is paused, cannot execute instruction
+23:44:33 - Executing instruction
+23:44:44 - System resumed
+23:44:51 - Cable ID: 000
+23:44:51 - Cable Length: 0
+23:44:51 - Cable Gauge: 0
+23:44:51 - Executing instruction
+00:05:00 - Arduino connected
+00:05:05 - Cable ID: 000
+00:05:06 - Cable Length: 0
+00:05:06 - Cable Gauge: 0
+00:05:06 - Executing instruction
+00:10:25 - Arduino connected
+00:10:30 - Cable ID:
+00:10:30 - Cable Length: 0
+00:10:30 - Cable Gauge: 0
+00:10:30 - Executing instruction
+00:10:39 - System paused
+00:10:45 - System is paused, cannot execute instruction
+00:10:45 - Executing instruction
+00:13:28 - Arduino connected
+00:13:31 - Cable ID:
+00:13:31 - Cable Length: 0
+00:13:31 - Cable Gauge: 0
+00:13:31 - Executing instruction
+00:19:29 - Arduino connected
+00:19:31 - Cable ID: KLN.00|LENGTH
+00:19:31 - Cable Length: 1000
+00:19:32 - Cable Gauge: 3
+00:19:32 - Executing instruction
+00:23:06 - Connected
+00:27:53 - Cable ID: 0
+00:27:53 - Cable Length: 1000
+00:27:53 - Cable Gauge: 3
+00:29:25 - Cable ID: KLN.00
+00:29:25 - Cable Length: 1000
+00:29:25 - Cable Gauge: 3
+00:34:31 - OpenCut Machine Connected
+00:34:35 - Machine paused.
+00:34:45 - Machine resumed.
+00:34:50 - Cable ID: KLN.00
+00:34:50 - Cable Length: 1000
+00:34:50 - Cable Gauge: 3
+00:35:31 - Cable ID: X.01
+00:35:31 - Cable Length: 100
+00:35:31 - Cable Gauge: 2
+00:38:18 - OpenCut Machine Connected
+00:39:09 - OpenCut Machine Connected
+00:39:11 - --------------------
+00:39:11 - Cable ID: X.01
+00:39:11 - Cable Length: 100
+00:39:11 - Cable Gauge: 2
+00:39:12 - --------------------
+00:39:20 - !!!  Machine paused  !!!
+00:39:25 - --------------------
+00:39:25 - Cable ID: X.01
+00:39:25 - Cable Length: 100
+00:39:25 - Cable Gauge: 2
+00:39:25 - --------------------
+00:41:12 - OpenCut Machine Connected
+00:41:15 - --------------------
+00:41:15 - Cable ID: KLN.00
+00:41:15 - Cable Length: 1000
+00:41:16 - Cable Gauge: 3
+00:41:16 - --------------------
+00:41:18 - !!!  Machine paused  !!!
+00:41:26 - !!!  Machine resumed  !!!
+00:41:28 - --------------------
+00:41:28 - Cable ID: KLN.00
+00:41:28 - Cable Length: 1000
+00:41:28 - Cable Gauge: 3
+00:41:28 - --------------------
+00:43:43 - OpenCut Machine Connected
+00:43:47 - --------------------
+00:43:47 - Cable ID: KLN.00
+00:43:47 - Cable Length: 1000
+00:43:47 - Cable Gauge: 3
+00:43:47 - --------------------
+00:43:50 - !!!  Machine paused  !!!
+00:43:54 - !!!  Machine is paused and cannot execute instructions  !!!
+00:45:05 - OpenCut Machine Connected
+00:45:07 - --------------------
+00:45:07 - Cable ID: KLN.00
+00:45:07 - Cable Length: 1000
+00:45:07 - Cable Gauge: 3
+00:45:08 - --------------------
+00:45:11 - --  Machine paused  --
+00:45:24 - !!!  System is paused, cannot execute instruction  !!!
+00:45:53 - OpenCut Machine Connected
+00:45:57 - --------------------
+00:45:57 - Cable ID: KLN.00
+00:45:57 - Cable Length: 1000
+00:45:57 - Cable Gauge: 3
+00:45:57 - --------------------
+00:46:00 - --  Machine paused  --
+00:46:03 - 
+00:46:03 - !!!  System is paused, cannot execute instruction  !!!
+00:46:03 - 
+00:46:11 - --  Machine resumed --
+00:46:15 - --------------------
+00:46:15 - Cable ID: X.01
+00:46:15 - Cable Length: 100
+00:46:15 - Cable Gauge: 2
+00:46:15 - --------------------
