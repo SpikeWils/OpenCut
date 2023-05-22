@@ -1,3 +1,17 @@
+#  ▄██████▄     ▄███████▄    ▄████████ ███▄▄▄▄    ▄████████ ███    █▄      ███     
+# ███    ███   ███    ███   ███    ███ ███▀▀▀██▄ ███    ███ ███    ███ ▀█████████▄
+# ███    ███   ███    ███   ███    █▀  ███   ███ ███    █▀  ███    ███    ▀███▀▀██
+# ███    ███   ███    ███  ▄███▄▄▄     ███   ███ ███        ███    ███     ███   ▀
+# ███    ███ ▀█████████▀  ▀▀███▀▀▀     ███   ███ ███        ███    ███     ███
+# ███    ███   ███          ███    █▄  ███   ███ ███    █▄  ███    ███     ███
+# ███    ███   ███          ███    ███ ███   ███ ███    ███ ███    ███     ███
+#  ▀██████▀   ▄████▀        ██████████  ▀█   █▀  ████████▀  ████████▀     ▄████▀
+#
+#
+# *****************************************************
+#  IMPORT MODULES
+# *****************************************************
+
 import os
 import sys
 import serial
@@ -8,59 +22,75 @@ import datetime
 import json
 from serial.tools import list_ports
 
-def get_available_ports():
-    ports = list_ports.comports()
-    return [port.device for port in ports]
+# ──────────────────────────────────────
+#   GET AVAILABLE PORTS
+# ──────────────────────────────────────
 
-class CableData:
-    def __init__(self, cable_id, length, cable_gauge):
+def get_available_ports():                                                      #Define function get_available_ports
+    ports = list_ports.comports()                                               #List available COM ports and store in ports variable
+    return [port.device for port in ports]                                      #Generate list from ports variable
+
+# ──────────────────────────────────────
+#   CABLE DATA
+# ──────────────────────────────────────
+
+class CableData:                                                                #Define class CableData
+    def __init__(self, cable_id, length, cable_gauge):                          #Define cable data structure (cable_id, length, cable_gauge)
         self.cable_id = cable_id
         self.length = length
         self.cable_gauge = cable_gauge
 
-    def to_string(self):
-        return "Cable ID: {}, Length: {}, Cable Gauge: {}".format(self.cable_id, self.length, self.cable_gauge)
+    def to_string(self):                                                                                                    #Define function to_string for CableData class
+        return "Cable ID: {}, Length: {}, Cable Gauge: {}".format(self.cable_id, self.length, self.cable_gauge)             #Return formatted data string of CableData class
 
-class CableDataWidget(QWidget):
-    def __init__(self, parent):
-        super().__init__()
+# ──────────────────────────────────────
+#   CABLE DATA WIDGET
+# ──────────────────────────────────────
+
+class CableDataWidget(QWidget):                                                 #Define class CableDataWidget
+    def __init__(self, parent):                                                 #Define widget class constructor
+        super().__init__()                                                      #Initialise widget
 
         self.parent = parent
-        self.initUI()
+        self.initUI()                                                           # Call initialise widget user interface
 
-    def initUI(self):
-        self.cable_id_edit = QLineEdit(self)
-        self.cable_id_edit.setPlaceholderText('Cable ID')
+    def initUI(self):                                                           #Define function initUI
+        self.cable_id_edit = QLineEdit(self)                                    #Create text input field
+        self.cable_id_edit.setPlaceholderText('Cable ID')                       #Set placeholder text
         self.length_edit = QLineEdit(self)
         self.length_edit.setPlaceholderText('Length (mm)')
         self.cable_gauge_edit = QLineEdit(self)
         self.cable_gauge_edit.setPlaceholderText('Cable Gauge')
 
-        save_button = QPushButton('Save', self)
-        save_button.clicked.connect(self.save_data)
+        save_button = QPushButton('Save', self)                                 #Create push button object with "Save" text
+        save_button.clicked.connect(self.save_data)                             #Connect button clicked state to save data function
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.cable_id_edit)
-        layout.addWidget(self.length_edit)
-        layout.addWidget(self.cable_gauge_edit)
-        layout.addWidget(save_button)
-        self.setLayout(layout)
+        layout = QVBoxLayout()                                                  #Arrange child objects in vertical column in order they appear below (set layout)
+        layout.addWidget(self.cable_id_edit)                                    #Add cable ID text entry box
+        layout.addWidget(self.length_edit)                                      #Add length text entry box
+        layout.addWidget(self.cable_gauge_edit)                                 #Add cable gauge text entry box
+        layout.addWidget(save_button)                                           #Add save button
+        self.setLayout(layout)                                                  #Make CableDataWidget follow layout
 
-    def save_data(self):
-        cable_id = self.cable_id_edit.text()
-        length = self.length_edit.text()
-        cable_gauge = self.cable_gauge_edit.text()
+    def save_data(self):                                                        #Define function save_data (Saves data entered in cable_id, length, cable_gauge fields)
+        cable_id = self.cable_id_edit.text()                                    #Retrieve text from cable_id text entry box, store in variable cable_id
+        length = self.length_edit.text()                                        #Retrieve text from length text entry box, store in variable length
+        cable_gauge = self.cable_gauge_edit.text()                              #Retrieve text from cable_gauge text entry box, store in variable cable_gauge
 
-        if cable_id and length and cable_gauge:
-            data = CableData(cable_id, length, cable_gauge)
-            self.parent.cable_data.append(data)
-            self.parent.update_cable_data_list()
-            self.parent.save_cable_data()  # Save cable data to the JSON file when new data is added
-            self.cable_id_edit.clear()
-            self.length_edit.clear()
-            self.cable_gauge_edit.clear()
-        else:
-            QMessageBox.warning(self, "Warning", "Please fill in all fields.")
+        if cable_id and length and cable_gauge:                                 #If all three parameters have been entered:
+            data = CableData(cable_id, length, cable_gauge)                     #Create new CableData object and assign to data variable
+            self.parent.cable_data.append(data)                                 #Add data to cable_data list
+            self.parent.update_cable_data_list()                                #Update the cable data list to show the new saved entry
+            self.parent.save_cable_data()                                       #Save the cable data to the JSON file when new data is added
+            self.cable_id_edit.clear()                                          #Clear contents of text entry box after data is saved
+            self.length_edit.clear()                                            #Clear contents of text entry box after data is saved
+            self.cable_gauge_edit.clear()                                       #Clear contents of text entry box after data is saved
+        else:                                                                   #Otherwise:
+            QMessageBox.warning(self, "Warning", "Please fill in all fields.")  #Display warning message
+
+# ──────────────────────────────────────
+#   APP SETTINGS WIDGET
+# ──────────────────────────────────────
 
 class SettingsWindow(QWidget):
     def __init__(self, parent):
@@ -96,6 +126,10 @@ class SettingsWindow(QWidget):
         self.parent.filePath = self.filePathEdit.text()
         self.parent.initLogFile()
         QSettings('OpenCut', 'OpenCut Interface').setValue('filePath', self.parent.filePath)  # Save the edited filepath to QSettings
+
+# ──────────────────────────────────────
+#   MICROCONTROLLER CONTROL WIDGET
+# ──────────────────────────────────────
 
 class ArduinoController(QWidget):
     def __init__(self):

@@ -262,3 +262,18 @@ Printed ascii character: 69
 00:46:15 - Cable Length: 100
 00:46:15 - Cable Gauge: 2
 00:46:15 - --------------------
+19:19:54 - OpenCut Machine Connected
+19:20:04 - --  Machine paused  --
+19:20:09 - --  Machine resumed --
+19:20:13 - --  Machine paused  --
+19:20:15 - --  Machine resumed --
+19:20:32 - --------------------
+19:20:32 - Cable ID: KLN.00
+19:20:32 - Cable Length: 1000
+19:20:33 - Cable Gauge: 3
+19:20:33 - --------------------
+19:20:54 - --  Machine paused  --
+19:20:59 - 
+19:20:59 - !!!  System is paused, cannot execute instruction  !!!
+19:20:59 - 
+19:21:05 - --  Machine resumed --
