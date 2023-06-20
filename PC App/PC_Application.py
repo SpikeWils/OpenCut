@@ -1,4 +1,4 @@
-#  ▄██████▄     ▄███████▄    ▄████████ ███▄▄▄▄    ▄████████ ███    █▄      ███     
+#  ▄██████▄     ▄███████▄    ▄████████ ███▄▄▄▄    ▄████████ ███    █▄      ███
 # ███    ███   ███    ███   ███    ███ ███▀▀▀██▄ ███    ███ ███    ███ ▀█████████▄
 # ███    ███   ███    ███   ███    █▀  ███   ███ ███    █▀  ███    ███    ▀███▀▀██
 # ███    ███   ███    ███  ▄███▄▄▄     ███   ███ ███        ███    ███     ███   ▀
@@ -52,7 +52,7 @@ class CableDataWidget(QWidget):                                                 
         super().__init__()                                                      #Initialise widget
 
         self.parent = parent
-        self.initUI()                                                           # Call initialise widget user interface
+        self.initUI()                                                           #Call initialise widget user interface
 
     def initUI(self):                                                           #Define function initUI
         self.cable_id_edit = QLineEdit(self)                                    #Create text input field
@@ -92,40 +92,39 @@ class CableDataWidget(QWidget):                                                 
 #   APP SETTINGS WIDGET
 # ──────────────────────────────────────
 
-class SettingsWindow(QWidget):
-    def __init__(self, parent):
-        super().__init__()
+class SettingsWindow(QWidget):                                                  #Define class SettingsWindow
+    def __init__(self, parent):                                                 #Define widget class constructor
+        super().__init__()                                                      #Initialise widget
 
-        self.parent = parent
+        self.parent = parent                                                    #Call initialise widget user interface
         self.initUI()
 
-    def initUI(self):
-        # Set up file path input field
-        self.filePathTitle = QLabel("Data Log Filepath", self)  # Add this line
-        self.filePathEdit = QLineEdit(self)
-        self.filePathEdit.setText(self.parent.filePath)
-        self.filePathEdit.setPlaceholderText('File Path')
-        self.filePathEdit.editingFinished.connect(self.filePathEdited)
+    def initUI(self):                                                           #Define function initUI
+        self.filePathTitle = QLabel("Data Log Filepath", self)                  #Set up file path input field
+        self.filePathEdit = QLineEdit(self)                                     #
+        self.filePathEdit.setText(self.parent.filePath)                         #
+        self.filePathEdit.setPlaceholderText('File Path')                       #
+        self.filePathEdit.editingFinished.connect(self.filePathEdited)          #
 
-        # Set up back button
-        backButton = QPushButton('Back', self)
-        backButton.clicked.connect(self.backButtonClicked)
 
-        vbox = QVBoxLayout()
-        vbox.addStretch(1)
-        vbox.addWidget(self.filePathTitle)  # Add this line
-        vbox.addWidget(self.filePathEdit)
-        vbox.addWidget(backButton)
-        self.setLayout(vbox)
-        self.setWindowTitle('OpenCut Settings')
+        backButton = QPushButton('Back', self)                                  #Create push button object with "Back" text
+        backButton.clicked.connect(self.backButtonClicked)                      #Connect button clicked state to back button clicked function
 
-    def backButtonClicked(self):
+        vbox = QVBoxLayout()                                                    #Arrange child objects in vertical column in order they appear below (set layout)
+        vbox.addStretch(1)                                                      #Add stretchable space (resize with window)
+        vbox.addWidget(self.filePathTitle)                                      #Dislay file path
+        vbox.addWidget(self.filePathEdit)                                       #Input/edit filepath
+        vbox.addWidget(backButton)                                              #Add back button
+        self.setLayout(vbox)                                                    #Apply vbox layut to self
+        self.setWindowTitle('OpenCut Settings')                                 #Window title
+
+    def backButtonClicked(self):                                                #Close window when back button clicked
         self.close()
 
-    def filePathEdited(self):
+    def filePathEdited(self):                                                   #Function to save filepath when text box clicked off or window closed
         self.parent.filePath = self.filePathEdit.text()
         self.parent.initLogFile()
-        QSettings('OpenCut', 'OpenCut Interface').setValue('filePath', self.parent.filePath)  # Save the edited filepath to QSettings
+        QSettings('OpenCut', 'OpenCut Interface').setValue('filePath', self.parent.filePath)  #Save the edited filepath to QSettings
 
 # ──────────────────────────────────────
 #   MICROCONTROLLER CONTROL WIDGET
