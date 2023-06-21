@@ -78,7 +78,7 @@ Steps per mm = ─────────────────────�
 
 #include <Arduino.h>  // Import the Arduino library for easy microcontroller programming
 #include <AccelStepper.h>
-
+#include "CableIDPrinter.h"
 
 /*****************************************************
    DEFINE PINS
@@ -95,6 +95,14 @@ Steps per mm = ─────────────────────�
 #define CM_HOME_SWITCH_PIN 28                         //Define pin number for homing switch (N.O)
 #define CM_LIMIT_SWITCH_MAX_PIN 29                    //Define pin number for maximum R.O.M limit switch
 #define CM_LIMIT_SWITCH_MIN_PIN 30                    //Define pin number for minimum R.O.M limit switch
+
+#define PRINTER_PIN 2                                 //Define pin number for print head controller
+
+#define RED_ANDON_PIN 7                               //Define pin to control andon light
+#define YEL_ANDON_PIN 8                               //Define pin to control andon light
+#define GRN_ANDON_PIN 9                               //Define pin to control andon light
+
+#define CABLE_DETECTION_PIN 54                        //Define pin which cable detection device is connected (must be ADC pin)
 
 /*****************************************************
    DEFINE PARAMETERS
@@ -151,16 +159,17 @@ boolean newData = false;                              // Declare and initialize 
 boolean paused = false;                               // Declare and initialize a boolean flag for the paused state
 
 int CM_homing_pos = 0;                                //Declare global variable for homing position
-
-
+int cutPosition = 100;                                //Length of travel of linear actuator for cut motor (final position of blade after cutting)
+int releasePosition = -350;                           //Distance to move cable in reverse to release from feed rollers
 
 /*****************************************************
    DECLARE OBJECTS
 *****************************************************/
 
 AccelStepper FeedMotor(AccelStepper::DRIVER, FM_PUL_PIN, FM_DIR_PIN);     //Create class for feed motor
-AccelStepper CutMotor(AccelStepper::DRIVER, CM_PUL_PIN, CM_DIR_PIN);     //Create class for cut motor
+AccelStepper CutMotor(AccelStepper::DRIVER, CM_PUL_PIN, CM_DIR_PIN);      //Create class for cut motor
 
+CableIDPrinter printer(PRINTER_PIN);                                      //Create printer class initialize on printer pin
 
 //===============================================================================================================================================
 //===============================================================================================================================================
@@ -218,6 +227,12 @@ void setup()
   Serial.begin(9600);                                 // Initialize serial communication at 9600 baud rate
   Serial.println("OpenCut Machine Connected");        // Print a connection message to the serial monitor
 
+  pinMode(YEL_ANDON_PIN, OUTPUT);                     //Set pin as output
+  pinMode(RED_ANDON_PIN, OUTPUT);                     //Set pin as output
+  pinMode(GRN_ANDON_PIN, OUTPUT);                     //Set pin as output
+
+  digitalWrite(YEL_ANDON_PIN, HIGH);                  //Switch on yellow andon
+
   FeedMotor.setEnablePin(FM_ENA_PIN);                 //Declare feed motor enable pin [Must be manually declared when using driver type in class]
   FeedMotor.setPinsInverted(false, false, true);      //Invert the logic of the enable pin (step, direction, enable)
   FeedMotor.setMaxSpeed(FM_MAX_SPEED);                //Set speed = steps/second
@@ -225,15 +240,11 @@ void setup()
 
   FeedMotor.disableOutputs();                         //Prevent current flow to motor (prevents overheating)
 
-  CutMotor.setEnablePin(CM_ENA_PIN);                  //Declare feed motor enable pin [Must be manually declared when using driver type in class]
-  CutMotor.setPinsInverted(false, false, true);       //Invert the logic of the enable pin (step, direction, enable)
-  CutMotor.setMaxSpeed(CM_MAX_SPEED);                 //Set speed = steps/second
-  CutMotor.setAcceleration(CM_MAX_ACCEL);             //Set acceleration = steps/(second)^2
-  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
 
   CM_startup_homing_sequence();                      //Call function for homing cut motor at startup
 
   Serial.println("Setup Complete");                   //Print to serial monitor
+  digitalWrite(GRN_ANDON_PIN, HIGH);                  //Switch on green andon
 }
 
 /*──────────────────────────────────────
@@ -266,6 +277,7 @@ void loop()
       {                                             
         paused = true;                                // Set the paused flag to true
         Serial.println("--  Machine paused  --");     // Print a paused message to the serial monitor
+        digital.write(YEL_ANDON_PIN, HIGH);         //Switch on yellow andon
       }
       
       else if (command == "resume" && paused)         // If the command is "resume" and the machine is paused
@@ -291,6 +303,57 @@ void loop()
     Serial.print("Cable Gauge: ");                    // Print "Cable Gauge: " to the serial monitor
     Serial.println(cableGauge);                       // Print the cable gauge to the serial monitor
     Serial.println("--------------------");           // Print a separator line to the serial monitor
-    newData = false;                                  // Reset the newData flag to false
   }
+
+if (paused = false && )
+  int distance = cableLength;                         //Read the linear distance value from the cable data
+  int steps = map(distance, 0, 100, 0, FM_D2S_FACTOR);    //Map the linear distance to a number of steps
+
+  FeedMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
+  FeedMotor.setCurrentPosition(0);                     //Set current motor position as zero (this does not move the motor to position zero it sets the stored position to zero)
+  FeedMotor.moveTo(steps);                             //Move the feed motor by the number of steps required
+
+  while (FeedMotor.isRunning())                        //While the motor is in motion
+  {
+    FeedMotor.run();                                   //Advance motor to next step
+    printer.printCableIDToInkShield(cableID);          //Print cable ID
+  }
+
+  FeedMotor.disableOutputs();                          //Disable the outputs on the motor controller (prevent current flowing to motor)
+  delay(1000);                                         //Wait 1 sec
+  FeedMotor.setCurrentPosition(0);                     //Set motor position as zero
+
+  CutMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
+  CutMotor.moveTo(cutPosition);                       //Move the cut motor to the final blade position
+
+  while (CutMotor.isRunning())                        //While the motor is in motion
+  {
+    CutMotor.run();                                   //Advance motor to next step
+  }
+
+  CutMotor.moveTo(CM_homing_pos);                     //Move the cut motor to the home position
+
+  while (CutMotor.isRunning())                        //While the motor is in motion
+  {
+    CutMotor.run();                                   //Advance motor to next step
+  }
+
+  CutMotor.disableOutputs();                          //Disable the outputs on the motor controller (prevent current flowing to motor)
+  delay(1000);                                        //Wait 1 sec
+
+  FeedMotor.enableOutputs();                           //Enable outputs on motor controller (allow current flow to motor)
+  FeedMotor.setCurrentPosition(0);                     //Set current motor position as zero (this does not move the motor to position zero it sets the stored position to zero)
+  FeedMotor.moveTo(releasePosition);                   //Move the feed motor by the number of steps required
+
+  while (FeedMotor.isRunning())                        //While the motor is in motion
+  {
+    FeedMotor.run();                                   //Advance motor to next step
+  }
+
+  FeedMotor.disableOutputs();                          //Disable the outputs on the motor controller (prevent current flowing to motor)
+  delay(1000);                                         //Wait 1 sec
+  FeedMotor.setCurrentPosition(0);                     //Set motor position as zero
+
+
+  newData = false;                                  // Reset the newData flag to false
 }
